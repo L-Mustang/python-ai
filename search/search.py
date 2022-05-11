@@ -17,6 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from turtle import end_fill
 import util
 
 class SearchProblem:
@@ -194,7 +195,29 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    checkedStates = set()
+    firstNode = (problem.getStartState(), [], 0)
+
+    queue = util.PriorityQueue()
+    queue.update(firstNode, 0)
+
+    while not queue.isEmpty():
+        state, actions, costs = queue.pop()
+        
+        if state not in checkedStates:
+            successors = problem.getSuccessors(state)
+            checkedStates.add(state)
+
+            for successorState, successorAction, successorCost in successors:
+                    allActions = actions + [successorAction]
+                    allCosts = costs + successorCost
+                    queue.update((successorState, allActions, allCosts), allCosts + heuristic(successorState, problem))
+
+            if problem.isGoalState(state):
+                return actions
+
+
+    return actions
 
 
 # Abbreviations
