@@ -96,7 +96,7 @@ def depthFirstSearch(problem):
     while not stack.isEmpty():
         state, actions = stack.pop()
         
-        if state in checkedStates:
+        if state not in checkedStates:
             
             if problem.isGoalState(state):
                 return actions
