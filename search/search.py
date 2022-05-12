@@ -17,7 +17,6 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
-from turtle import end_fill
 import util
 
 class SearchProblem:
