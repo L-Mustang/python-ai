@@ -96,14 +96,15 @@ def depthFirstSearch(problem):
     while not stack.isEmpty():
         state, actions = stack.pop()
         
-        if problem.isGoalState(state):
-            return actions
+        if state in checkedStates:
+            
+            if problem.isGoalState(state):
+                return actions
 
-        successors = problem.getSuccessors(state)
-        checkedStates.add(state)
+            successors = problem.getSuccessors(state)
+            checkedStates.add(state)
 
-        for successorState, successorAction, _ in successors:
-            if successorState not in checkedStates:
+            for successorState, successorAction, _ in successors:
                 allActions = actions + [successorAction]
                 stack.push((successorState, allActions))
 
@@ -122,14 +123,15 @@ def breadthFirstSearch(problem):
     while not queue.isEmpty():
         state, actions = queue.pop()
 
-        if problem.isGoalState(state):
-            return actions
+        if state not in checkedStates:
 
-        successors = problem.getSuccessors(state)
-        checkedStates.add(state)
+            if problem.isGoalState(state):
+                return actions
 
-        for successorState, successorAction, _ in successors:
-            if successorState not in checkedStates:
+            successors = problem.getSuccessors(state)
+            checkedStates.add(state)
+
+            for successorState, successorAction, _ in successors:
                 allActions = actions + [successorAction]
                 queue.push((successorState, allActions))
 
