@@ -288,6 +288,16 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        cornersReached = [False, False, False, False]
+        if self.startingPosition in self.corners:
+            i = self.corners.index(self.startingPosition)
+            cornersReached[i] = True
+        
+        # The state to pass to the search
+        self.startingState = (self.startingPosition, tuple(cornersReached))
+
+        # TODO This is a bit sus, the assignment seems to recommend not doing this, yet it's done in FoodProblem
+        self.startingGameState = startingGameState
 
     def getStartState(self):
         """
@@ -295,14 +305,14 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startingState
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return all(state[1])
 
     def getSuccessors(self, state):
         """
@@ -325,7 +335,23 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                nextState = (nextx, nexty)
 
+                # Set reached corner to true if pacman reaches it
+                cornersReached = list(state[1])
+                if nextState in self.corners:
+                    i = self.corners.index(nextState)
+                    cornersReached[i] = True # Must convert tuple back to list since tuple is immutavb
+                
+                # Must set cost to 1, because no cost function is given
+                cost = 1
+                successors.append( ( (nextState, tuple(cornersReached)), action, cost) )
+
+        
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
