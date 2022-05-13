@@ -40,6 +40,7 @@ class ReflexAgent(Agent):
         """
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions()
+        # legalMoves = filter(lambda action: action != Directions.STOP, legalMoves)
 
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
@@ -48,6 +49,7 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
+        print(legalMoves[chosenIndex])
 
         return legalMoves[chosenIndex]
 
@@ -74,7 +76,56 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        def getFoodDistanceScore():
+            minDistance = 0
+            maxDistance = 0
+
+            newFoodList = newFood.asList()
+
+            for xy2 in newFoodList:
+                # Check if food was already reached
+                x2, y2 = xy2
+                if newFood[x2][y2]:
+                    xy1 = newPos
+                    # Manhattan distance to non-reached point
+                    distance = util.manhattanDistance(xy1, xy2)
+                    if distance < minDistance or minDistance == 0:
+                        minDistance = distance
+                    if distance > maxDistance or maxDistance == 0:
+                        maxDistance = distance
+                        
+            return -abs(minDistance)
+
+        def getFoodCountScore():
+          return -abs(len(newFood.asList()))*1e6
+
+        def getGhostScore():
+            minDistance = 0
+            minXY = (0,0)
+            
+            for ghostState in newGhostStates:
+                xy2 = ghostState.getPosition()
+                xy1 = newPos
+                # TODO code duplication
+                distance = util.manhattanDistance(xy1, xy2)
+                if distance < minDistance or minDistance <= 1:
+                    minDistance = distance            
+  
+                if minDistance <= 1:
+                  return -1e9
+                return 0
+                
+        # If distance between ghost and pacman increases, increase weight of food
+        # If number of food decreases, increase weight of food
+        scores = {"Food distance score": getFoodDistanceScore(),
+                  "Food count score": getFoodCountScore(),
+                  "Ghost score": getGhostScore(),
+        }
+        scores["Total score"] = sum(scores.values())
+        print(scores)
+        
+        return sum(scores.values())
 
 def scoreEvaluationFunction(currentGameState):
     """
