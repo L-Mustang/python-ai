@@ -493,8 +493,31 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
+    # https://stackoverflow.com/a/69454493/10787114
 
-    return 0
+    minDistance = 0;
+    minXY = (0,0)
+    maxDistance = 0
+    maxXY = (0,0)
+
+    food = foodGrid.asList()
+
+    for xy2 in food:
+        # Check if food was already reached
+        x2, y2 = xy2;
+        if foodGrid[x2][y2]:
+            xy1 = position
+            # Manhattan distance to non-reached point
+            distance = util.manhattanDistance(xy1, xy2)
+            if distance < minDistance or minDistance == 0:
+                minDistance = distance
+                minXY = xy2
+            if distance > maxDistance or maxDistance == 0:
+                maxDistance = distance
+                maxXY = xy2
+
+    return util.manhattanDistance(minXY, maxXY) + minDistance
+    # return 0 # Default to trivial solution
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
