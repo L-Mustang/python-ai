@@ -96,7 +96,7 @@ def depthFirstSearch(problem):
     while not stack.isEmpty():
         state, actions = stack.pop()
         
-        if state in checkedStates:
+        if state not in checkedStates:
             
             if problem.isGoalState(state):
                 return actions
@@ -172,6 +172,10 @@ def uniformCostSearch(problem):
         state, actions, costs = queue.pop()
         
         if state not in checkedStates:
+
+            if problem.isGoalState(state):
+                return actions
+
             successors = problem.getSuccessors(state)
             checkedStates.add(state)
 
@@ -179,10 +183,6 @@ def uniformCostSearch(problem):
                     allActions = actions + [successorAction]
                     allCosts = costs + successorCost
                     queue.update((successorState, allActions, allCosts), allCosts)
-
-            if problem.isGoalState(state):
-                return actions
-
 
     return actions
 
@@ -206,6 +206,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         state, actions, costs = queue.pop()
         
         if state not in checkedStates:
+
+            if problem.isGoalState(state):
+                return actions
+
             successors = problem.getSuccessors(state)
             checkedStates.add(state)
 
@@ -213,10 +217,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     allActions = actions + [successorAction]
                     allCosts = costs + successorCost
                     queue.update((successorState, allActions, allCosts), allCosts + heuristic(successorState, problem))
-
-            if problem.isGoalState(state):
-                return actions
-
 
     return actions
 
