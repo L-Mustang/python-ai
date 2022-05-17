@@ -114,7 +114,8 @@ class ReflexAgent(Agent):
   
                 if minDistance <= 1:
                   return -1e9
-                return 0
+            
+            return 0
                 
         # If distance between ghost and pacman increases, increase weight of food
         # If number of food decreases, increase weight of food
