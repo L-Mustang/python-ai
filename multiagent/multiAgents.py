@@ -12,9 +12,12 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from collections import deque
+from email import utils
+from pydoc import getpager
 from util import manhattanDistance
 from game import Directions
-import random, util
+import random, util, search, searchAgents
 
 from game import Agent
 
@@ -28,6 +31,18 @@ class ReflexAgent(Agent):
       headers.
     """
 
+    def __init__(self):
+        self.path = deque([])
+
+    def setPath(self, gameState):
+        print("Calculating new path with A*")
+        self.path = deque(search.aStarSearch(searchAgents.FoodSearchProblem(gameState), searchAgents.foodHeuristic))
+
+    def getPathNext(self):     
+        return self.path[0]
+
+    def popPath(self):
+         return self.path.popleft()
 
     def getAction(self, gameState):
         """
@@ -41,7 +56,8 @@ class ReflexAgent(Agent):
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions()
         # legalMoves = filter(lambda action: action != Directions.STOP, legalMoves)
-
+        if len(self.path) == 0:
+          self.setPath(gameState)
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
@@ -49,8 +65,12 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-        print(legalMoves[chosenIndex])
-
+        print("Taking: ", legalMoves[chosenIndex], "A* Path: ", self.getPathNext())
+        if legalMoves[chosenIndex] == self.getPathNext():
+          self.popPath()
+          
+        else:
+          self.setPath(gameState)
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
@@ -76,29 +96,11 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-
-        def getFoodDistanceScore():
-            minDistance = 0
-            maxDistance = 0
-
-            newFoodList = newFood.asList()
-
-            for xy2 in newFoodList:
-                # Check if food was already reached
-                x2, y2 = xy2
-                if newFood[x2][y2]:
-                    xy1 = newPos
-                    # Manhattan distance to non-reached point
-                    distance = util.manhattanDistance(xy1, xy2)
-                    if distance < minDistance or minDistance == 0:
-                        minDistance = distance
-                    if distance > maxDistance or maxDistance == 0:
-                        maxDistance = distance
-                        
-            return -abs(minDistance)
-
-        def getFoodCountScore():
-          return -abs(len(newFood.asList()))*1e6
+        def getPathScore():
+          if len(self.path) != 0 :
+            if action == self.getPathNext():
+                return 1e6
+          return 0
 
         def getGhostScore():
             minDistance = 0
@@ -116,14 +118,11 @@ class ReflexAgent(Agent):
                   return -1e9
                 return 0
                 
-        # If distance between ghost and pacman increases, increase weight of food
-        # If number of food decreases, increase weight of food
-        scores = {"Food distance score": getFoodDistanceScore(),
-                  "Food count score": getFoodCountScore(),
-                  "Ghost score": getGhostScore(),
+        scores = {
+          "Path score": getPathScore(),
+          "Ghost score": getGhostScore(),
         }
         scores["Total score"] = sum(scores.values())
-        print(scores)
         
         return sum(scores.values())
 
