@@ -116,7 +116,8 @@ class ReflexAgent(Agent):
   
                 if minDistance <= 1:
                   return -1e9
-                return 0
+            
+            return 0
                 
         scores = {
           "Path score": getPathScore(),
